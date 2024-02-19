@@ -1,0 +1,46 @@
+image: docker:24.0.5
+
+services: 
+    - docker:24.0.5-dind
+
+variables:
+    KUBECONFIG: "/home/anna/.kube/config"
+
+stages:
+    - build
+    - upload
+    - deploy 
+
+build:
+    tags:
+        - lab8
+    stage: build
+    before_script:
+    - apt install -y python3 python3-pip python3-dev git 
+    script:
+        - docker --version
+        - docker build -t choreo:$CI_COMMIT_SHORT_SHA.
+
+upload:
+    tags:
+        - lab8
+    stage: upload
+    before_script:      
+        - docker info
+    script:
+        - kind load docker-image choreo:${CI_COMMIT_SHORT_SHA}
+
+deploy:
+    tags:
+        - lab8
+    stage: deploy
+    environment:
+        name: production
+    before_script:
+        - kubectl version --client
+        - kind delete clusters --all
+        - kind create cluster --config configs/cluster_conf.yml
+        - steep 25
+        - kubectl apply f configs/nginx.pod.ynt
+    script:
+        - kubectl get pods

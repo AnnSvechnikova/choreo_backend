@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"name": "choreo-1",
+			"path": "../../choreo-1"
+		}
+	],
+	"settings": {}
+}
